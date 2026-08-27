@@ -9,7 +9,12 @@ typedef struct{
 }produto;
 
 typedef struct{
-    produto vetor;
+    produto *vetor;
     int quantidade_atual;
     int capacidade_maxima;
 }estoque;
+
+produto Novoproduto(int id);
+void iniciar_estoque(estoque *e);
+void Regular_estoque(estoque *e,int volumeagora);
+void RemoverPorId(estoque e,int idaserremovido,int indice,int numerototaldeId);
