@@ -15,7 +15,20 @@ typedef struct{
 }estoque;
 
 void iniciar_estoque(estoque *e);
-void Regular_estoque(estoque *e,int volumeagora);
 
-int removerrecursivo(int alocalizar,estoque *e,int sintaxe,int volume_agora);
-int removerporid(estoque *e,int volumeagora, int volume_agora);
+void Regular_estoque(estoque *e,int volumeagora);
+produto Novoproduto(int *id,estoque e, int volume_agora);
+
+
+int localizarid(estoque *e, int idloc,int volumetot,int sintaxe);
+void removerrecursivo(int id_localizado,estoque *e,int volume_agora);
+
+int removerporid(estoque *e, int volume_agora);
+
+
+void listarprodutosrecursivo(estoque *e,int sintaxe,int volume_agora);
+void ListarProdutos(estoque *e,int volume_agora);
+void localizarporIDrecursivo(int volumetot,int idprocurado,estoque *estoq,int sintaxe);
+
+
+int buscarporID(int volumetotal, estoque *e);
