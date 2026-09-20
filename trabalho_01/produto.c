@@ -1,118 +1,142 @@
 #include "produto.h"
 
 void iniciar_estoque(estoque *e){
-    e->capacidade_maxima=0;
-    e->vetor=malloc(e->capacidade_maxima *sizeof(produto));
+    e->capacidade_maxima = 2;
+    e->quantidade_atual = 0;
+    e->vetor = malloc(e->capacidade_maxima * sizeof(produto));
 }
 
-void Regular_estoque(estoque *e,int volumeagora){
-    e->quantidade_atual=volumeagora;
-
-    if(e->capacidade_maxima==0){
-        e->capacidade_maxima=2;
-    }else if(e->capacidade_maxima==volumeagora){
-        int *temp = (estoque *)realloc(e->vetor, sizeof(estoque) * 2);
-        if(temp==NULL){
-            printf("ERRO DE ALOCACAO");
-            return 1;
+void Regular_estoque(estoque *e, int volumeagora){
+    e->quantidade_atual = volumeagora;
+    if(volumeagora >= e->capacidade_maxima){
+        e->capacidade_maxima *= 2;
+        produto *temp = realloc(e->vetor, sizeof(produto) * e->capacidade_maxima);
+        if(temp == NULL){
+            printf("ERRO DE ALOCACAO\n");
+            return;
         }
-        e->capacidade_maxima=e->vetor=temp;
-        return;
+        e->vetor = temp;
     }
-    return;
 }
-produto Novoproduto(int *id,estoque e, int volume_agora){
+
+produto Novoproduto(int id, int volume_agora){
     produto add;
+    add.id = id; 
     
     printf("Insira o nome do seu produto:\n>> ");
-    scanf(" %49[^\n]", e.vetor[volume_agora].nome);
-    printf("Preco unitario do produto: \n>>");
-    scanf("%f",&e.vetor[volume_agora].preco);
-    printf("Insira a quantidade do produto: \n>>");
-    scanf("%d", &e.vetor[volume_agora].quantidade);
-    printf("(Id colocado automaticamente)\nID do produto: \n>>%d\n",*id);
-    e.vetor[volume_agora].id=*id;
+    scanf(" %49[^\n]", add.nome);
+    printf("Preco unitario do produto: \n>> ");
+    scanf("%f", &add.preco);
+    printf("Insira a quantidade do produto: \n>> ");
+    scanf("%d", &add.quantidade);
+    printf("(Id colocado automaticamente)\nID do produto: \n>> %d\n", id);
     printf(">>>>>>>Produto adcionado com Sucesso!<<<<<<\n");
     return add;
 }
 
 
-int localizarid(estoque *e, int idloc,int volume_agora,int sintaxe){
-    if(sintaxe>volume_agora){
+int localizarid(estoque *e, int idloc, int volume_agora, int sintaxe){
+    if(sintaxe >= volume_agora){
         printf("ID nao localizado.\n");
         return -1;
-    }
-    if(e->vetor[sintaxe].id==idloc){
+    } else if(e->vetor[sintaxe].id == idloc){
         return sintaxe;
     }
-    localizarid(e, idloc,volume_agora,++sintaxe);
+    return localizarid(e, idloc, volume_agora, ++sintaxe);
 }
 
-//corrigir!!!
-void removerID(int id_localizado,estoque *e,int volume_agora){
-    if (id_localizado==1);
-}
-
-int removerporid(estoque *e, int volume_agora){
-    if (volume_agora<1){
-        printf("A lista esta vazia!!\n");
+// Questão 2
+void removerID(int IdRemovido, estoque *e, int volume_agora, int sintaxe, int ProximoId){
+    if(sintaxe >= volume_agora - 1){
+        e->vetor[sintaxe] = (produto){0};
         return;
+    }
+    if(sintaxe >= IdRemovido){
+        e->vetor[sintaxe] = e->vetor[sintaxe + 1];
+    }
+    removerID(IdRemovido, e, volume_agora, ++sintaxe, ProximoId);
+}
+
+int removerporid(estoque *e, int volume_agora, int ProximoId){
+    if (volume_agora == 0){
+        printf("A lista esta vazia!!\n");
+        return 0;
     }
     int idremove;
-    printf("\nInsira o id que sera removido\n>>");
-    scanf("%d",&idremove);
-    int id_localizado=localizarid(e, idremove,volume_agora,1);
-    if (id_localizado>0){
-        removerID(id_localizado,e,volume_agora);
-        (volume_agora)--;
+    printf("\nInsira o id que sera removido\n>> ");
+    scanf("%d", &idremove);
+    while(idremove < 1 || idremove >= ProximoId){
+        printf("\nEsse ID nao existe ou e invalido.\n");
+        printf("Insira o id que sera removido\n>> ");
+        scanf("%d", &idremove);
     }
-    return;
+    
+    
+    int id_localizado = localizarid(e, idremove, volume_agora, 0);
+    if(id_localizado < 0){
+        return 0;
+    }
+    
+    removerID(id_localizado, e, volume_agora, id_localizado, ProximoId);
+    printf("\n-------------------------\n");
+    printf("ID Removido com sucesso\n");
+    printf("-------------------------\n");
+    return 1;
 }
 
-
-
-void listarprodutosrecursivo(estoque *e,int sintaxe,int volume_agora){
-    if(sintaxe>volume_agora){
+// Opção 3
+void listarprodutosrecursivo(estoque *e, int sintaxe, int volume_agora){
+    if(sintaxe >= volume_agora){
         return;
     }
-    printf("Nome: %s\n",e->vetor[sintaxe].nome);
-    printf("preco: %2f\n",e->vetor[sintaxe].preco);
-    printf("Quantidade: %d\n",e->vetor[sintaxe].quantidade);
-    printf("\n");
-    listarprodutosrecursivo(e,++sintaxe,volume_agora);
+    if(e->vetor[sintaxe].id != 0){
+        printf("ID: %d\n", e->vetor[sintaxe].id);
+        printf("Nome: %s\n", e->vetor[sintaxe].nome);
+        printf("preco: %.2f\n", e->vetor[sintaxe].preco);
+        printf("Quantidade: %d\n", e->vetor[sintaxe].quantidade);
+        printf("=======================\n");
+    }
+    listarprodutosrecursivo(e, ++sintaxe, volume_agora);
 }
-void ListarProdutos(estoque *e,int volume_agora){
-    if (volume_agora<1){
+
+void ListarProdutos(estoque *e, int volume_agora){
+    if (volume_agora < 1){
         printf("A lista esta vazia!!\n");
         return;
     }
-    listarprodutosrecursivo(e,0,volume_agora);
-    return;
+    listarprodutosrecursivo(e, 0, volume_agora);
 }
 
-void localizarporIDrecursivo(int volumetot,int idprocurado,estoque *estoq,int sintaxe){
-    if(sintaxe==estoq->vetor[sintaxe].id){
-        printf("=========Produto Localizado==========\n");
-        printf("Nome: %s\n",estoq->vetor[sintaxe].nome);
-        printf("preco: %2f\n",estoq->vetor[sintaxe].preco);
-        printf("Quantidade: %d\n",estoq->vetor[sintaxe].quantidade);
-        printf("\n");
-        return;
-    }else if(sintaxe>volumetot){
+// Opção 4 
+void buscarprodutosrecursivo(int volumetot, estoque *estoq, int sintaxe, int idloc){
+    if(sintaxe >= volumetot){
         printf("ID inexistente.\n");
         return;
     }
-    localizarporIDrecursivo(volumetot,idprocurado,estoq,++sintaxe);
+    if(idloc == estoq->vetor[sintaxe].id){
+        printf("=========Produto Localizado==========\n");
+        printf("Nome: %s\n", estoq->vetor[sintaxe].nome);
+        printf("preco: %.2f\n", estoq->vetor[sintaxe].preco);
+        printf("Quantidade: %d\n", estoq->vetor[sintaxe].quantidade);
+        printf("ID: %d\n", estoq->vetor[sintaxe].id);
+        printf("=====================================\n");
+        return;
+    }
+    buscarprodutosrecursivo(volumetot, estoq, ++sintaxe, idloc);
 }
 
-int buscarporID(int volumetotal, estoque *e){
-    if(volumetotal<1){
+void buscarporID(int volumetotal, estoque *e, int ProximoId){
+    if(volumetotal < 1){
         printf("A lista esta vazia!\n");
         return;
     }
     int locID;
-    printf("\nInsira o ID de busca:\n>>");
-    scanf("%d",&locID);
-    localizarporIDrecursivo(volumetotal,locID,e,0);
-    return;
+    printf("\nInsira o ID de busca:\n>> ");
+    scanf("%d", &locID);
+    while(locID < 1 || locID >= ProximoId){
+        printf("\nEsse ID nao existe ou e invalido.\n");
+        printf("Insira o ID de busca\n>> ");
+        scanf("%d", &locID);
+    }
+    buscarprodutosrecursivo(volumetotal, e, 0, locID);
 }
