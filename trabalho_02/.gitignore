@@ -1,0 +1,13 @@
+.vscode/
+output/
+*.exe
+main
+produto
+.agents
+loja
+Loja/
+.codex
+estoque_asan
+estoque_asan.exe
+estoque
+estoque.exe
